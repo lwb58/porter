@@ -72,6 +72,7 @@ def gen_dance_video():
     files = files[:3]
     clips = []
     authors = []
+    print(files)
     for file in files:
         if os.path.exists(file):
             title = os.path.basename(file)
@@ -93,7 +94,7 @@ def gen_dance_video():
         codec='libx264',
         audio_codec='aac',
         # logger=None
-        threads=2
+        # threads=2
     )
     r.lpush(GEN_DANCE_VIDEOS_KEY, filename)
 
