@@ -115,7 +115,10 @@ def upload_dance_video_to_bilibili():
 
 
 def main():
-    pass
+    download_sina_dance_videos()
+    gen_dance_video()
+    upload_dance_video_to_bilibili()
+
 
 
 if __name__ == "__main__":
