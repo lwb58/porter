@@ -1,3 +1,4 @@
+python /root/porter/porter/set_cookies.py
 python /root/movpy/setup.py install
 python /root/fuck_bilibili/setup.py install
 python /root/fuck_sina/setup.py install

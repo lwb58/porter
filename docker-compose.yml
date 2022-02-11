@@ -4,7 +4,7 @@ services:
   porter:
     image: python:naruto
     working_dir: "/root/static"
-    command: ls /root/porter; 
+    command: sh /root/porter/setup.sh
     volumes: 
       - "/root/github/porter:/root/porter"
       - "/root/github/fuck_sina:/root/fuck_sina"
