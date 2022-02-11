@@ -1,14 +1,3 @@
-<<<<<<< HEAD
-.vscode/
-venv/
-dist/
-*.egg-info/
-__pycache__/
-build/
-.DS_Store
-porter/static/
-porter/temp/
-=======
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -138,4 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
->>>>>>> 8f4bdd8b138024d4d5386787d85f4058ee8389dc
+.DS_Store
+porter/static/
+porter/temp/
