@@ -1,8 +1,18 @@
+
 python /root/porter/porter/set_cookies.py
-python /root/movpy/setup.py install
-python /root/fuck_bilibili/setup.py install
-python /root/fuck_sina/setup.py install
-python /root/porter/setup.py install
+
+cd /root/movpy
+python setup.py install
+
+cd /root/fuck_bilibili
+python setup.py install
+
+cd /root/fuck_sina
+python setup.py install
+
+cd /root/porter
+python setup.py install
+
 cd /root/static
 download_sina_dance_videos
 gen_dance_video

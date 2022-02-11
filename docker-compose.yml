@@ -8,7 +8,7 @@ services:
     volumes: 
       - "/root/github/porter:/root/porter"
       - "/root/github/fuck_sina:/root/fuck_sina"
-      - "/root/github/fuck_sina:/root/fuck_bilibili"
+      - "/root/github/fuck_bilibili:/root/fuck_bilibili"
       - "/root/github/movpy:/root/movpy"
       - "/root/github/static:/root/static"
     deploy:
