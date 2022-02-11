@@ -100,7 +100,7 @@ def gen_dance_video():
 
 def upload_dance_video_to_bilibili():
     bilibili_cookies = r.hvals("bilibili_cookies")
-    count = r.get(SUBMIT_BILIBILI_COUNT_KEY)
+    count = int(r.get(SUBMIT_BILIBILI_COUNT_KEY))
     bilibili_cookies = bilibili_cookies[count % len(bilibili_cookies)]
     filepath = r.rpop(GEN_DANCE_VIDEOS_KEY)
     title = os.path.basename(filepath)[:-4]
