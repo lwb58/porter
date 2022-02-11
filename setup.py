@@ -1,7 +1,7 @@
 import os
 from setuptools import setup, find_packages
 
-package_name = os.path.basename(os.path.dirname(__file__))
+package_name = os.path.basename(os.path.dirname(os.path.abspath(__file__)))
 #  打包
 setup(
     name=package_name,
