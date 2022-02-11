@@ -6,6 +6,7 @@ from sina import api as sina_api
 from bilibili import api as bilibili_api
 from bilibili.base.data import TAG_MAP
 from movpy.editor import *
+import random
 
 pool = redis.ConnectionPool(host='localhost', port=6379, decode_responses=True)
 r = redis.Redis(connection_pool=pool)
@@ -78,7 +79,9 @@ def download_dance_videos(sina_cookies, count, basedir=""):
             
 
 def merge_dance_videos_to_bilibili(bilibili_cookies):
-    files = r.zrange(DANCE_VIDEOS_KEY, 0, 2)
+    files = r.zrange(DANCE_VIDEOS_KEY, 0, 5)
+    random.shuffle(files)
+    files = files[:3]
     clips = []
     authors = []
     tag = "舞蹈,打卡挑战"
@@ -105,7 +108,7 @@ def merge_dance_videos_to_bilibili(bilibili_cookies):
         audio_codec='aac',
     )
     submit_video_to_bilibili(bilibili_cookies, filename, title, 154, tag)
-    # os.remove(filename)
+    os.remove(filename)
 
 
 
