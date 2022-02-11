@@ -113,9 +113,10 @@ def merge_dance_videos_to_bilibili(bilibili_cookies):
 
 
 def main():
-    bilibili_cookies = r.hget("bilibili_cookies", "13123371380")
+    bilibili_cookies = r.hvals("bilibili_cookies")
+    count = r.get(SUBMIT_BILIBILI_COUNT_KEY)
+    bilibili_cookies = bilibili_cookies[count % len(bilibili_cookies)]
     sina_cookies = r.hget("sina_cookies", "guest")
-    # sina2bilibili(sina_cookies, bilibili_cookies, "舞蹈", 5)
     download_dance_videos(sina_cookies, 5, "static")
     merge_dance_videos_to_bilibili(bilibili_cookies)
 
