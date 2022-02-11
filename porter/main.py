@@ -1,12 +1,9 @@
 # -*- coding:utf-8 -*-
-import re
 import os
 import random
-import shutil
 import redis
 from sina import api as sina_api
 from bilibili import api as bilibili_api
-from bilibili.base.data import TAG_MAP
 from movpy.editor import *
 
 pool = redis.ConnectionPool(host='localhost', port=6379, decode_responses=True)
@@ -14,21 +11,8 @@ r = redis.Redis(connection_pool=pool)
 
 DANCE_VIDEOS_KEY = "dance_videos"
 SUBMIT_BILIBILI_COUNT_KEY = "submit_bilibili_count"
-
-def complete_tags(tags, title, channel):
-    tags = tags or ""
-    tags = tags.split(",")
-    tags.extend(re.findall(r"(《[^》]+》|%[^\s]+\s|\s[^\s]{2,4}\s|【[^】]+】|#[^\s&^#]+#)", title))
-    tags.extend(TAG_MAP.get(channel)["tags"])
-    tags.append(channel)
-    tags = [tag.strip("\n\r\t()（）！～~!*+%,，。.、-《》【】#@& ").replace("[超话]", "") for tag in tags]
-    tags = list(filter(lambda tag: tag, tags))
-    tags = ",".join(
-        list(set(
-            [tag[:12] for tag in tags]
-        ))[:10]
-    )
-    return tags
+UPLOAD_DANCE_PATH = "upload/dance"
+DOWNLOAD_DANCE_PATH = "download/dance"
 
 
 def submit_video_to_bilibili(cookies, filename, title, tid, tag, desc=""):
@@ -62,13 +46,15 @@ def submit_video_to_bilibili(cookies, filename, title, tid, tag, desc=""):
     print(res)
 
 
-def download_dance_videos(sina_cookies, count, basedir=""):
+def download_sina_dance_videos():
+    count = 5
+    sina_cookies = r.hget("sina_cookies", "guest")
     videos = sina_api.fetch_channel_videos_playinfo(sina_cookies, "舞蹈", count)
     for video in videos:
         author = video["playinfo"]["author"]
         url = video["playinfo"]["url"]
         title = video["title"] 
-        author_dir = os.path.join(basedir, author)
+        author_dir = os.path.join(DOWNLOAD_DANCE_PATH, author)
         filepath = os.path.join(author_dir, title + ".mp4")
         if not os.path.exists(author_dir):
             os.makedirs(author_dir) 
@@ -79,19 +65,17 @@ def download_dance_videos(sina_cookies, count, basedir=""):
             r.zadd(DANCE_VIDEOS_KEY, {filepath: 0})
             
 
-def merge_dance_videos_to_bilibili(bilibili_cookies):
+def gen_dance_video():
     files = r.zrange(DANCE_VIDEOS_KEY, 0, 5)
     random.shuffle(files)
     files = files[:3]
     clips = []
     authors = []
-    tag = "舞蹈,打卡挑战"
     for file in files:
         if os.path.exists(file):
             title = os.path.basename(file)
             author = os.path.basename(os.path.dirname(file))
             authors.append(author)
-            tag = complete_tags(tag, title, "舞蹈")
             clips.append(VideoFileClip(file).audio_fadeout(3))
             r.zincrby(DANCE_VIDEOS_KEY, 1, file)
         else:
@@ -99,32 +83,41 @@ def merge_dance_videos_to_bilibili(bilibili_cookies):
 
     r.incr(SUBMIT_BILIBILI_COUNT_KEY, 1)
     count = r.get(SUBMIT_BILIBILI_COUNT_KEY)
-    if not os.path.exists("temp"):
-        os.makedirs("temp")
+    if not os.path.exists(UPLOAD_DANCE_PATH):
+        os.makedirs(UPLOAD_DANCE_PATH)
     title = f"{' | '.join(authors) } | 第 {count} 弹"
-    filename = os.path.join("temp", f"{title}.mp4")
+    filename = os.path.join(UPLOAD_DANCE_PATH, f"{title}.mp4")
     concate_clips(*clips).write_videofile(
         filename,
         codec='libx264',
         audio_codec='aac',
+        # logger=None
     )
-    try:
-        submit_video_to_bilibili(bilibili_cookies, filename, title, 154, tag)
-    except Exception as e:
-        raise e
-    finally:
-        shutil.rmtree("temp")
+
+
+def upload_dance_video_to_bilibili():
+    bilibili_cookies = r.hvals("bilibili_cookies")
+    count = r.get(SUBMIT_BILIBILI_COUNT_KEY)
+    bilibili_cookies = bilibili_cookies[count % len(bilibili_cookies)]
+    filepath = ""
+    title = ""
+    for file in os.listdir(UPLOAD_DANCE_PATH):
+        if os.path.isfile(file) and file.endswith(".mp4"):
+            filepath = os.path.join(UPLOAD_DANCE_PATH, file)
+            title = file[:-4]
+            break
+    if filepath:
+        try:
+            submit_video_to_bilibili(bilibili_cookies, filepath, title, 154, "舞蹈,打卡挑战")
+        except Exception as e:
+            raise e
+        finally:
+            os.remove(filepath)
 
 
 
 def main():
-    bilibili_cookies = r.hvals("bilibili_cookies")
-    count = r.get(SUBMIT_BILIBILI_COUNT_KEY)
-    bilibili_cookies = bilibili_cookies[count % len(bilibili_cookies)]
-    sina_cookies = r.hget("sina_cookies", "guest")
-    download_dance_videos(sina_cookies, 5, "static")
-    merge_dance_videos_to_bilibili(bilibili_cookies)
-
+    pass
 
 if __name__ == "__main__":
     main()

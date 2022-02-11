@@ -20,9 +20,11 @@ setup(
     platforms="any",
     license='MIT',
     entry_points = {
-        # 'console_scripts': [
-        #     'toolpy = toolpy.main:main',
-        # ]
+        'console_scripts': [
+            'download_sina_dance_videos = porter.main:download_sina_dance_videos',
+            'gen_dance_video = porter.main:gen_dance_video',
+            'upload_dance_video_to_bilibili = porter.main:upload_dance_video_to_bilibili',
+        ]
     },
     install_requires=[
         # 'PyMySQL<=0.9.3,>=0.9',
