@@ -6,7 +6,7 @@ from sina import api as sina_api
 from bilibili import api as bilibili_api
 from movpy.editor import *
 
-pool = redis.ConnectionPool(host='localhost', port=6379, decode_responses=True)
+pool = redis.ConnectionPool(host='redis', port=6379, decode_responses=True)
 r = redis.Redis(connection_pool=pool)
 
 DANCE_VIDEOS_KEY = "dance_videos"

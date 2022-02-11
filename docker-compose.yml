@@ -1,10 +1,29 @@
 version: '3'
 services:
+
+  porter:
+    image: python:naruto
+    working_dir: "/root/static"
+    command: sh /root/porter/setup.sh; 
+    volumes: 
+      - "/root/github/porter:/root/porter"
+      - "/root/github/fuck_sina:/root/fuck_sina"
+      - "/root/github/fuck_sina:/root/fuck_bilibili"
+      - "/root/github/movpy:/root/movpy"
+      - "/root/github/static:/root/static"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          memory: 1000M
+        
+
   rabbitmq:
     image: redis
     container_name: redis
     hostname: redis
-    restart: always
     environment:
       - "TZ=Asia/Shanghai"
     volumes:
@@ -12,3 +31,10 @@ services:
       - "./data/redis.conf:/etc/redis.conf"
     ports: 
       - "6379:6379"
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: any
+      resources:
+        limits:
+          memory: 200M
