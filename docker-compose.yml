@@ -1,0 +1,14 @@
+version: '3'
+services:
+  rabbitmq:
+    image: redis
+    container_name: redis
+    hostname: redis
+    restart: always
+    environment:
+      - "TZ=Asia/Shanghai"
+    volumes:
+      - "./data/data:/data"
+      - "./data/redis.conf:/etc/redis.conf"
+    ports: 
+      - "6379:6379"
