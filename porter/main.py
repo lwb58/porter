@@ -88,7 +88,7 @@ def merge_dance_videos_to_bilibili(bilibili_cookies):
             author = os.path.basename(os.path.dirname(file))
             authors.append(author)
             tag = complete_tags(tag, title, "舞蹈")
-            clips.append(VideoFileClip(file))
+            clips.append(VideoFileClip(file).audio_fadeout(3))
             r.zincrby(DANCE_VIDEOS_KEY, 1, file)
         else:
             r.zrem(DANCE_VIDEOS_KEY, file)
