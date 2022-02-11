@@ -1,12 +1,13 @@
 # -*- coding:utf-8 -*-
 import re
 import os
+import random
+import shutil
 import redis
 from sina import api as sina_api
 from bilibili import api as bilibili_api
 from bilibili.base.data import TAG_MAP
 from movpy.editor import *
-import random
 
 pool = redis.ConnectionPool(host='localhost', port=6379, decode_responses=True)
 r = redis.Redis(connection_pool=pool)
@@ -107,8 +108,12 @@ def merge_dance_videos_to_bilibili(bilibili_cookies):
         codec='libx264',
         audio_codec='aac',
     )
-    submit_video_to_bilibili(bilibili_cookies, filename, title, 154, tag)
-    os.remove(filename)
+    try:
+        submit_video_to_bilibili(bilibili_cookies, filename, title, 154, tag)
+    except Exception as e:
+        raise e
+    finally:
+        shutil.rmtree("temp")
 
 
 
