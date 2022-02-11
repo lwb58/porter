@@ -10,6 +10,7 @@ pool = redis.ConnectionPool(host='localhost', port=6379, decode_responses=True)
 r = redis.Redis(connection_pool=pool)
 
 DANCE_VIDEOS_KEY = "dance_videos"
+GEN_DANCE_VIDEOS_KEY = "gen_dance_videos"
 SUBMIT_BILIBILI_COUNT_KEY = "submit_bilibili_count"
 UPLOAD_DANCE_PATH = "upload/dance"
 DOWNLOAD_DANCE_PATH = "download/dance"
@@ -53,17 +54,17 @@ def download_sina_dance_videos():
     for video in videos:
         author = video["playinfo"]["author"]
         url = video["playinfo"]["url"]
-        title = video["title"] 
+        title = video["title"]
         author_dir = os.path.join(DOWNLOAD_DANCE_PATH, author)
         filepath = os.path.join(author_dir, title + ".mp4")
         if not os.path.exists(author_dir):
-            os.makedirs(author_dir) 
+            os.makedirs(author_dir)
         if os.path.exists(filepath):
             continue
         else:
             sina_api.download(sina_cookies, url, filepath)
             r.zadd(DANCE_VIDEOS_KEY, {filepath: 0})
-            
+
 
 def gen_dance_video():
     files = r.zrange(DANCE_VIDEOS_KEY, 0, 5)
@@ -93,31 +94,27 @@ def gen_dance_video():
         audio_codec='aac',
         # logger=None
     )
+    r.lpush(GEN_DANCE_VIDEOS_KEY, filename)
 
 
 def upload_dance_video_to_bilibili():
     bilibili_cookies = r.hvals("bilibili_cookies")
     count = r.get(SUBMIT_BILIBILI_COUNT_KEY)
     bilibili_cookies = bilibili_cookies[count % len(bilibili_cookies)]
-    filepath = ""
-    title = ""
-    for file in os.listdir(UPLOAD_DANCE_PATH):
-        if os.path.isfile(file) and file.endswith(".mp4"):
-            filepath = os.path.join(UPLOAD_DANCE_PATH, file)
-            title = file[:-4]
-            break
-    if filepath:
-        try:
-            submit_video_to_bilibili(bilibili_cookies, filepath, title, 154, "舞蹈,打卡挑战")
-        except Exception as e:
-            raise e
-        finally:
-            os.remove(filepath)
-
+    filepath = r.rpop(GEN_DANCE_VIDEOS_KEY)
+    title = os.path.basename(filepath)[:-4]
+    try:
+        submit_video_to_bilibili(
+            bilibili_cookies, filepath, title, 154, "舞蹈,打卡挑战")
+    except Exception as e:
+        raise e
+    finally:
+        os.remove(filepath)
 
 
 def main():
     pass
+
 
 if __name__ == "__main__":
     main()
