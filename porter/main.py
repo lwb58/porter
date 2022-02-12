@@ -59,7 +59,8 @@ def download_sina_dance_videos():
         title = video["title"]
         author_dir = os.path.join(DOWNLOAD_DANCE_PATH, author)
         temp_dir = "/tmp/dance"
-        filepath = os.path.join(temp_dir, title + ".mp4")
+        temp_filepath = os.path.join(temp_dir, title + ".mp4")
+        filepath = os.path.join(author_dir, title + ".mp4")
         if not os.path.exists(author_dir):
             os.makedirs(author_dir)
         if not os.path.exists(temp_dir):
@@ -67,8 +68,8 @@ def download_sina_dance_videos():
         if os.path.exists(filepath):
             continue
         else:
-            sina_api.download(sina_cookies, url, filepath)
-            shutil.move(filepath, author_dir)
+            sina_api.download(sina_cookies, url, temp_filepath)
+            shutil.move(temp_filepath, author_dir)
             r.zadd(DANCE_VIDEOS_KEY, {filepath: 0})
 
 
