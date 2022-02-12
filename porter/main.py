@@ -69,16 +69,17 @@ def download_sina_dance_videos():
 def gen_dance_video():
     files = r.zrange(DANCE_VIDEOS_KEY, 0, 5)
     random.shuffle(files)
-    files = files[:2]
     clips = []
     authors = []
     print(files)
     for file in files:
-        if os.path.exists(file):
-            title = os.path.basename(file)
+        if os.path.exists(file) and os.path.getsize(file) > 0:
+            title = os.path.basename(file)[:-4]
             author = os.path.basename(os.path.dirname(file))
             authors.append(author)
             clips.append(VideoFileClip(file).audio_fadeout(3))
+            if len(clips) >= 2:
+                break
             r.zincrby(DANCE_VIDEOS_KEY, 1, file)
         else:
             r.zrem(DANCE_VIDEOS_KEY, file)
@@ -87,7 +88,7 @@ def gen_dance_video():
     count = r.get(SUBMIT_BILIBILI_COUNT_KEY)
     if not os.path.exists(UPLOAD_DANCE_PATH):
         os.makedirs(UPLOAD_DANCE_PATH)
-    title = f"{title} | 第 {count} 弹"
+    title = f"{title}  第 {count} 弹"
     filename = os.path.join(UPLOAD_DANCE_PATH, f"{title}.mp4")
     concate_clips(*clips).write_videofile(
         filename,
