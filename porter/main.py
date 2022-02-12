@@ -88,7 +88,7 @@ def gen_dance_video():
     count = r.get(SUBMIT_BILIBILI_COUNT_KEY)
     if not os.path.exists(UPLOAD_DANCE_PATH):
         os.makedirs(UPLOAD_DANCE_PATH)
-    title = f"{title}  第 {count % 1000} 弹"
+    title = f"{title}  第 {int(count) % 1000} 弹"
     filename = os.path.join(UPLOAD_DANCE_PATH, f"{title}.mp4")
     concate_clips(*clips).write_videofile(
         filename,
