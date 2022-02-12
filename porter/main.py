@@ -68,7 +68,7 @@ def download_sina_dance_videos():
             continue
         else:
             sina_api.download(sina_cookies, url, filepath)
-            shutil.copy(filepath, author_dir)
+            shutil.move(filepath, author_dir)
             r.zadd(DANCE_VIDEOS_KEY, {filepath: 0})
 
 
