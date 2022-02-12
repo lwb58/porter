@@ -2,6 +2,7 @@
 import os
 import re
 import random
+import shutil
 import redis
 from sina import api as sina_api
 from bilibili import api as bilibili_api
@@ -57,13 +58,17 @@ def download_sina_dance_videos():
         url = video["playinfo"]["url"]
         title = video["title"]
         author_dir = os.path.join(DOWNLOAD_DANCE_PATH, author)
-        filepath = os.path.join(author_dir, title + ".mp4")
+        temp_dir = "/tmp/dance"
+        filepath = os.path.join(temp_dir, title + ".mp4")
         if not os.path.exists(author_dir):
             os.makedirs(author_dir)
+        if not os.path.exists(temp_dir):
+            os.makedirs(temp_dir)
         if os.path.exists(filepath):
             continue
         else:
             sina_api.download(sina_cookies, url, filepath)
+            shutil.copy(filepath, author_dir)
             r.zadd(DANCE_VIDEOS_KEY, {filepath: 0})
 
 
