@@ -14,4 +14,4 @@ cd /root/porter
 python setup.py install > /dev/null
 
 cd /root/static
-python /root/porter/porter/main.py
+python -u /root/porter/porter/main.py
