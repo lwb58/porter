@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 import os
+import re
 import random
 import redis
 from sina import api as sina_api
@@ -45,7 +46,7 @@ def submit_video_to_bilibili(cookies, filename, title, tid, tag, desc=""):
     }
     res = bilibili_api.submit_video(cookies, info)
     print(res)
-
+        
 
 def download_sina_dance_videos():
     count = 5
@@ -106,6 +107,14 @@ def upload_dance_video_to_bilibili():
     bilibili_cookies = bilibili_cookies[count % len(bilibili_cookies)]
     filepath = r.rpop(GEN_DANCE_VIDEOS_KEY)
     title = os.path.basename(filepath)[:-4]
+    # b站视频标题只允许由中文、英文、数字、日文等可见字符组成
+    # 中文       \u4e00-\u9fa5
+    # 日文 平假名 \u3040-\u309f
+    # 日文 片假名 \u30a0-\u30ff
+    # 韩文       \uac00-\ud7ff
+    # 非字母数字  \W
+    # 字母数字    a-zA-Z0-9 
+    title = "".join(re.findall(r'[\u4e00-\u9fa5 | \u30a0-\u30ff | \u3040-\u309f | a-zA-Z0-9 | \W]+', title))
     try:
         submit_video_to_bilibili(
             bilibili_cookies, filepath, title, 154, "舞蹈,打卡挑战")
