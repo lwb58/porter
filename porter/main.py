@@ -95,9 +95,10 @@ def gen_dance_video():
         filename,
         codec='libx264',
         audio_codec='aac',
-        # logger=None
+        logger=None
         # threads=2
     )
+    print("gen_dance_video successful: ", filename)
     r.lpush(GEN_DANCE_VIDEOS_KEY, filename)
 
 
