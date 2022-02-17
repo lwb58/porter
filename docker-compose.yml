@@ -4,10 +4,11 @@ services:
   porter:
     image: python:naruto
     working_dir: "/root/static"
-    command: sh /root/porter/setup.sh
+    # command: sh /root/porter/setup.sh
     volumes: 
       - "/root/github/porter:/root/porter"
       - "/root/github/fuck_sina:/root/fuck_sina"
+      - "/root/github/fuck_intl:/root/fuck_intl"
       - "/root/github/fuck_bilibili:/root/fuck_bilibili"
       - "/root/github/movpy:/root/movpy"
       - "/root/github/static/download:/root/static/download"

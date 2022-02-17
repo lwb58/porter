@@ -1,24 +1,26 @@
 # -*- coding:utf-8 -*-
 import os
 import re
-import random
-import shutil
-import redis
-from sina import api as sina_api
 from bilibili import api as bilibili_api
-from movpy.editor import *
-
-pool = redis.ConnectionPool(host='redis', port=6379, decode_responses=True)
-r = redis.Redis(connection_pool=pool)
-
-DANCE_VIDEOS_KEY = "dance_videos"
-GEN_DANCE_VIDEOS_KEY = "gen_dance_videos"
-SUBMIT_BILIBILI_COUNT_KEY = "submit_bilibili_count"
-UPLOAD_DANCE_PATH = "upload/dance"
-DOWNLOAD_DANCE_PATH = "download/dance"
+from bilibili.base.data import TAG_MAP
+from porter.sina import task as sina_task
+from porter.intl import task as intl_task
+from porter import redis_client, settings
 
 
-def submit_video_to_bilibili(cookies, filename, title, tid, tag, desc=""):
+def submit_video_to_bilibili(cookies, filename, channel, tag="", desc=""):
+    # b站视频标题只允许由中文、英文、数字、日文等可见字符组成
+    # 中文       \u4e00-\u9fa5
+    # 日文 平假名 \u3040-\u309f
+    # 日文 片假名 \u30a0-\u30ff
+    # 韩文       \uac00-\ud7ff
+    # 非字母数字  \W
+    # 字母数字    a-zA-Z0-9 
+    assert channel in TAG_MAP.keys()
+    tid = TAG_MAP[channel]["tid"]
+    tag = tag or TAG_MAP[channel]["tags"]
+    title = os.path.basename(filename)[:-4]
+    title = "".join(re.findall(r'[\u4e00-\u9fa5 | \u30a0-\u30ff | \u3040-\u309f | a-zA-Z0-9 | \W]+', title))
     info = {
         "copyright": 1,  # 1:有版权  2:无
         "videos": [{
@@ -49,92 +51,25 @@ def submit_video_to_bilibili(cookies, filename, title, tid, tag, desc=""):
     print(res)
         
 
-def download_sina_dance_videos():
-    count = 5
-    sina_cookies = r.hget("sina_cookies", "guest")
-    videos = sina_api.fetch_channel_videos_playinfo(sina_cookies, "舞蹈", count)
-    for video in videos:
-        author = video["playinfo"]["author"]
-        url = video["playinfo"]["url"]
-        title = video["title"]
-        author_dir = os.path.join(DOWNLOAD_DANCE_PATH, author)
-        temp_dir = "/tmp/dance"
-        temp_filepath = os.path.join(temp_dir, title + ".mp4")
-        filepath = os.path.join(author_dir, title + ".mp4")
-        if not os.path.exists(author_dir):
-            os.makedirs(author_dir)
-        if not os.path.exists(temp_dir):
-            os.makedirs(temp_dir)
-        if os.path.exists(filepath):
-            continue
-        else:
-            sina_api.download(sina_cookies, url, temp_filepath)
-            shutil.move(temp_filepath, author_dir)
-            r.zadd(DANCE_VIDEOS_KEY, {filepath: 0})
 
-
-def gen_dance_video():
-    files = r.zrange(DANCE_VIDEOS_KEY, 0, 5)
-    random.shuffle(files)
-    clips = []
-    authors = []
-    print(files)
-    for file in files:
-        if os.path.exists(file) and os.path.getsize(file) > 0:
-            title = os.path.basename(file)[:-4]
-            author = os.path.basename(os.path.dirname(file))
-            authors.append(author)
-            clips.append(VideoFileClip(file).audio_fadeout(3))
-            if len(clips) >= 2:
-                break
-            r.zincrby(DANCE_VIDEOS_KEY, 1, file)
-        else:
-            r.zrem(DANCE_VIDEOS_KEY, file)
-
-    r.incr(SUBMIT_BILIBILI_COUNT_KEY, 1)
-    count = r.get(SUBMIT_BILIBILI_COUNT_KEY)
-    if not os.path.exists(UPLOAD_DANCE_PATH):
-        os.makedirs(UPLOAD_DANCE_PATH)
-    title = f"{title}  第 {int(count) % 1000} 弹"
-    filename = os.path.join(UPLOAD_DANCE_PATH, f"{title}.mp4")
-    concate_clips(*clips).write_videofile(
-        filename,
-        codec='libx264',
-        audio_codec='aac',
-        logger=None
-        # threads=2
-    )
-    print("gen_dance_video successful: ", filename)
-    r.lpush(GEN_DANCE_VIDEOS_KEY, filename)
-
-
-def upload_dance_video_to_bilibili():
-    bilibili_cookies = r.hvals("bilibili_cookies")
-    count = int(r.get(SUBMIT_BILIBILI_COUNT_KEY))
-    bilibili_cookies = bilibili_cookies[count % len(bilibili_cookies)]
-    filepath = r.rpop(GEN_DANCE_VIDEOS_KEY)
-    title = os.path.basename(filepath)[:-4]
-    # b站视频标题只允许由中文、英文、数字、日文等可见字符组成
-    # 中文       \u4e00-\u9fa5
-    # 日文 平假名 \u3040-\u309f
-    # 日文 片假名 \u30a0-\u30ff
-    # 韩文       \uac00-\ud7ff
-    # 非字母数字  \W
-    # 字母数字    a-zA-Z0-9 
-    title = "".join(re.findall(r'[\u4e00-\u9fa5 | \u30a0-\u30ff | \u3040-\u309f | a-zA-Z0-9 | \W]+', title))
-    try:
-        submit_video_to_bilibili(
-            bilibili_cookies, filepath, title, 154, "舞蹈,打卡挑战")
-    except Exception as e:
-        raise e
-    finally:
-        os.remove(filepath)
+def get_bilibili_cookies(key=None):
+    if key:
+        return redis_client.hget("bilibili_cookies", key)
+    count = redis_client.get(settings.SUBMIT_BILIBILI_COUNT_KEY)
+    bilibili_cookies = redis_client.hvals("bilibili_cookies")
+    return bilibili_cookies[count % len(bilibili_cookies)]
 
 
 def main():
-    download_sina_dance_videos()
-    gen_dance_video()
-    upload_dance_video_to_bilibili()
+    bilibili_cookie = get_bilibili_cookies()
+
+    sina_task.download_videos("舞蹈", 5)
+    video = sina_task.merge_videos("舞蹈", 2)
+    submit_video_to_bilibili(bilibili_cookie, video, "舞蹈", "舞蹈,打卡挑战,必剪创作")
+
+    intl_task.fetch_today_news()
+    video = intl_task.gen_news_video()
+    submit_video_to_bilibili(bilibili_cookie, video, "热点", "社会,国际,打卡挑战,必剪创作")
 
 
 

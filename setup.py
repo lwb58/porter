@@ -9,11 +9,11 @@ setup(
     packages=find_packages(),
     include_package_data=True,
     package_data = {
-        #  "toolpy": [
-        #     'template/*/*',
-        # ],
+         "porter": [
+            'static/media/*',
+        ],
     },
-    description='开发工具包的模板',
+    description='视频制作、搬运',
     author='Tu Weifeng',
     author_email='907391489@qq.com',
     url='https://github.com/tuweifeng',
@@ -21,14 +21,12 @@ setup(
     license='MIT',
     entry_points = {
         'console_scripts': [
-            'download_sina_dance_videos = porter.main:download_sina_dance_videos',
-            'gen_dance_video = porter.main:gen_dance_video',
-            'upload_dance_video_to_bilibili = porter.main:upload_dance_video_to_bilibili',
+            'fetch_today_news = porter.intl.task:fetch_today_news',
+            'gen_news_video = porter.intl.task:gen_news_video'
         ]
     },
     install_requires=[
-        # 'PyMySQL<=0.9.3,>=0.9',
-        # 'aiomysql==0.0.21'
+        'redis>=4.1.3'
     ],
-    python_requires='',
+    python_requires='>=3.5',
 )
