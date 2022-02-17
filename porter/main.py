@@ -69,7 +69,8 @@ def main():
 
     intl_task.fetch_today_news()
     video = intl_task.gen_news_video()
-    submit_video_to_bilibili(bilibili_cookie, video, "热点", "社会,国际,打卡挑战,必剪创作")
+    if video:
+        submit_video_to_bilibili(bilibili_cookie, video, "热点", "社会,国际,打卡挑战,必剪创作")
 
 
 

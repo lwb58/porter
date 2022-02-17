@@ -17,10 +17,10 @@ def fetch_today_news(limit=None):
 
 def gen_news_video():
     url = redis_client.rpop("intl")
-    data = redis_client.hget("intl", url)
-    data = json.loads(data)
-    filepath = os.path.join(settings.UPLOAD_PATH, data["title"] + ".mp4")
-    dub(settings.DUB_VIDEO, data["content"], "yanlijie", filepath, speed=3, bgm=settings.DUB_BGM)
-    return filepath
-    
+    if url:
+        data = redis_client.hget("intl", url)
+        data = json.loads(data)
+        filepath = os.path.join(settings.UPLOAD_PATH, data["title"] + ".mp4")
+        dub(settings.DUB_VIDEO, data["content"], "yanlijie", filepath, speed=3, bgm=settings.DUB_BGM)
+        return filepath
         
