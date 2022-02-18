@@ -13,6 +13,7 @@ services:
       - "/root/github/fuck_intl:/root/fuck_intl"
       - "/root/github/fuck_bilibili:/root/fuck_bilibili"
       - "/root/github/movpy:/root/movpy"
+      - "/root/github/toolpy:/root/toolpy"
 
   redis:
     image: redis

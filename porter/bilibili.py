@@ -4,9 +4,20 @@ import re
 from bilibili import api
 from bilibili.base.data import TAG_MAP
 from porter import bilibili_redis, settings
+from toolpy.wrapper import ConsoleScripts
 
 
+@ConsoleScripts
 def submit_video(cookies, filename, channel, tag="", desc=""):
+    '''投稿b站视频
+    @param: channel 
+        频道
+        综艺 美食 游戏 评测 音乐 影视 旅游 娱乐 体育 人文艺术 时尚美妆 动漫 知识 VLOG 搞笑幽默 舞蹈 纪录片
+    @param: tag
+        标签 egg: 社会,国际,打卡挑战,必剪创作
+    @param: desc
+        描述
+    '''
     # b站视频标题只允许由中文、英文、数字、日文等可见字符组成
     # 中文       \u4e00-\u9fa5
     # 日文 平假名 \u3040-\u309f
@@ -51,7 +62,9 @@ def submit_video(cookies, filename, channel, tag="", desc=""):
     return res
 
 
+@ConsoleScripts
 def get_cookies(key=None):
+    '''获取b站cookie'''
     if key:
         return bilibili_redis.hget("cookies", key)
     count = bilibili_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY)
@@ -59,7 +72,9 @@ def get_cookies(key=None):
     return cookies[count % len(cookies)]
 
 
+@ConsoleScripts
 def set_cookies(key, value):
+    '''设置b站cookie'''
     bilibili_redis.hset("cookies", key, value)
 
 

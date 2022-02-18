@@ -1,3 +1,6 @@
+cd /root/toolpy
+python setup.py install 
+
 cd /root/movpy
 python setup.py install 
 

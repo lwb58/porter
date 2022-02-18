@@ -4,10 +4,12 @@ from movpy.editor import concate_clips
 from sina import api
 from sina.base.data import SINA_CHANNEL_CID_MAP
 from porter import sina_redis, settings
+from toolpy.wrapper import ConsoleScripts
 
 
+@ConsoleScripts
 def download_videos(channel, limit=5):
-    '''
+    '''下载新浪视频
     @param: channel
         综艺 美食 游戏 评测 音乐 影视 旅游 娱乐 体育 人文艺术 时尚美妆 动漫 知识 VLOG 搞笑幽默 舞蹈 纪录片
     @param: limit
@@ -31,8 +33,9 @@ def download_videos(channel, limit=5):
             sina_redis.zadd(channel, {filepath: 0})
 
 
+@ConsoleScripts
 def merge_videos(channel, limit=2):
-    '''
+    '''拼接新浪视频
     @param: channel
         综艺 美食 游戏 评测 音乐 影视 旅游 娱乐 体育 人文艺术 时尚美妆 动漫 知识 VLOG 搞笑幽默 舞蹈 纪录片
     @param: limit
@@ -64,7 +67,9 @@ def merge_videos(channel, limit=2):
     return filename
 
 
+@ConsoleScripts
 def get_cookies(key=None):
+    '''获取新浪cookie'''
     if key:
         return sina_redis.hget("cookies", key)
     count = sina_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY)
@@ -72,7 +77,9 @@ def get_cookies(key=None):
     return cookies[count % len(cookies)]
 
 
+@ConsoleScripts
 def set_cookies(key, value):
+    '''设置新浪cookie'''
     sina_redis.hset("cookies", key, value)
 
 
