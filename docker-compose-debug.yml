@@ -4,21 +4,15 @@ services:
   porter:
     image: python:naruto
     working_dir: "/root/static"
-    command: sh /root/porter/setup.sh
-    volumes: 
+    container_name: porter
+    stdin_open: true
+    tty: true
+    volumes:
       - "/root/github/porter:/root/porter"
       - "/root/github/fuck_sina:/root/fuck_sina"
       - "/root/github/fuck_intl:/root/fuck_intl"
       - "/root/github/fuck_bilibili:/root/fuck_bilibili"
       - "/root/github/movpy:/root/movpy"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-      resources:
-        limits:
-          memory: 1000M
-        
 
   redis:
     image: redis
@@ -26,15 +20,5 @@ services:
     hostname: redis
     environment:
       - "TZ=Asia/Shanghai"
-    volumes:
-      - "./data/data:/data"
-      - "./data/redis.conf:/etc/redis.conf"
     ports: 
       - "6379:6379"
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: any
-      resources:
-        limits:
-          memory: 200M

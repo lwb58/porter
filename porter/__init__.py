@@ -1,7 +1,9 @@
 
 import redis
 
-__all__ = ["redis_client"]
+__all__ = ["bilibili_redis", "sina_redis", "intl_redis"]
 
-pool = redis.ConnectionPool(host='redis', port=6379, decode_responses=True)
-redis_client = redis.Redis(connection_pool=pool)
+bilibili_redis = redis.Redis(host='redis', port=6379, db=0, decode_responses=True)
+sina_redis = redis.Redis(host='redis', port=6379, db=1, decode_responses=True)
+intl_redis = redis.Redis(host='redis', port=6379, db=2, decode_responses=True)
+

@@ -2,7 +2,7 @@ import os
 
 STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 
-DOWNLOAD_PATH = "./download"
+DOWNLOAD_PATH = "/tmp/porter/download"
 UPLOAD_PATH = "/tmp/porter/upload"
 
 if not os.path.exists(DOWNLOAD_PATH):
