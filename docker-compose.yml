@@ -3,8 +3,8 @@ services:
 
   porter:
     image: python:naruto
-    working_dir: "/root/static"
-    command: sh /root/porter/setup.sh
+    working_dir: "/root/porter"
+    command: sh run.sh
     volumes: 
       - "/root/github/porter:/root/porter"
       - "/root/github/fuck_sina:/root/fuck_sina"

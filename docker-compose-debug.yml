@@ -3,7 +3,7 @@ services:
 
   porter:
     image: python:naruto
-    working_dir: "/root/static"
+    working_dir: "/root/porter"
     container_name: porter
     stdin_open: true
     tty: true
