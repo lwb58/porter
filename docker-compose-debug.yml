@@ -7,13 +7,15 @@ services:
     container_name: porter
     stdin_open: true
     tty: true
-    volumes:
-      - "/root/github/porter:/root/porter"
-      - "/root/github/fuck_sina:/root/fuck_sina"
-      - "/root/github/fuck_intl:/root/fuck_intl"
-      - "/root/github/fuck_bilibili:/root/fuck_bilibili"
-      - "/root/github/movpy:/root/movpy"
-      - "/root/github/toolpy:/root/toolpy"
+    volumes: 
+      - "../porter:/root/porter"
+      - "../fuck_sina:/root/fuck_sina"
+      - "../fuck_intl:/root/fuck_intl"
+      - "../fuck_bilibili:/root/fuck_bilibili"
+      - "../movpy:/root/movpy"
+      - "../toolpy:/root/toolpy"
+      - "./data/ImageMagick/policy.xml:/etc/ImageMagick-6/policy.xml"
+      - "./data/ssl/openssl.cnf:/etc/ssl/openssl.cnf"
 
   redis:
     image: redis
