@@ -67,7 +67,7 @@ def get_cookies(key=None):
     '''获取b站cookie'''
     if key:
         return bilibili_redis.hget("cookies", key)
-    count = bilibili_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY)
+    count = bilibili_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY) or 0
     cookies = bilibili_redis.hvals("cookies")
     return cookies[count % len(cookies)]
 

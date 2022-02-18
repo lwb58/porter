@@ -72,7 +72,7 @@ def get_cookies(key=None):
     '''获取新浪cookie'''
     if key:
         return sina_redis.hget("cookies", key)
-    count = sina_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY)
+    count = sina_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY) or 0
     cookies = sina_redis.hvals("cookies")
     return cookies[count % len(cookies)]
 
