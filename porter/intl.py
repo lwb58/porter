@@ -10,7 +10,7 @@ def fetch_today_news(limit=None):
     date = str(datetime.datetime.now().date())
     for i in api.fetch_jingji_news(date, limit=limit):
         if not intl_redis.hexists("jingji", i["url"]):
-            print(i["title"])
+            print(i)
             intl_redis.hset("jingji", i["url"], json.dumps(i))
             intl_redis.lpush("jingji", i["url"])
 
