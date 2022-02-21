@@ -69,7 +69,7 @@ def get_cookies(key=None):
         return bilibili_redis.hget("cookies", key)
     count = bilibili_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY) or 0
     cookies = bilibili_redis.hvals("cookies")
-    return cookies[count % len(cookies)]
+    return cookies[int(count) % len(cookies)]
 
 
 @ConsoleScripts
