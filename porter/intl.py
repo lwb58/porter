@@ -24,6 +24,11 @@ def gen_news_video():
         data = intl_redis.hget("jingji_set", url)
         data = json.loads(data)
         filepath = os.path.join(settings.UPLOAD_PATH, data["title"] + ".mp4")
-        dub(settings.DUB_VIDEO, data["content"], "yanlijie",
+        content = f'''
+        大家好，我是小芳。
+        {data["content"]}
+        以上就是视频的全部内容。您有什么看法欢迎留言告诉我。
+        '''
+        dub(settings.DUB_VIDEO, content, "yanlijie",
             filepath, speed=3, bgm=settings.DUB_BGM)
         return filepath

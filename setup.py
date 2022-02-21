@@ -32,6 +32,9 @@ setup(
             # bilibili
             'porter_bilibili_get_cookies   =   porter.bilibili:get_cookies.shell',
             'porter_bilibili_set_cookies   =   porter.bilibili:set_cookies.shell',
+            # task
+            'porter_task_1                 =   porter.main:task_1',
+            'porter_task_2                 =   porter.main:task_2',
         ]
     },
     install_requires=[
