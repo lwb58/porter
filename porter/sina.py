@@ -28,7 +28,7 @@ def download_videos(channel, limit=5):
         if not os.path.exists(author_dir):
             os.makedirs(author_dir)
 
-        if not sina_redis.sismember(channel, filepath):
+        if sina_redis.zrank(channel, filepath) is None:
             api.download(sina_cookies, url, filepath)
             sina_redis.zadd(channel, {filepath: 0})
 
