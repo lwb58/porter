@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from porter import task_sina, task_intl, task_bilibili
+from porter import task_sina, task_intl, task_bilibili, bilibili_redis
 
 
 def task_1():
@@ -10,15 +10,16 @@ def task_1():
 
 
 def task_2():
-    bilibili_cookie = task_bilibili.get_cookies()
+    bilibili_cookie = task_bilibili.get_cookies("13123371380")
     task_intl.fetch_today_news()
     video = task_intl.gen_news_video()
     task_bilibili.submit_video(bilibili_cookie, video, "热点", "社会,国际,打卡挑战,必剪创作")
 
 
 def main():
-    count = task_bilibili.get_submit_count()
-    if count % 3 == 0:
+    bilibili_redis.incr("task_count", 1)
+    task_count = int(bilibili_redis.get("task_count"))
+    if task_count % 2 == 0:
         task_2()
     else:
         task_1()
