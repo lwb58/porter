@@ -58,8 +58,7 @@ def merge_videos(channel, limit=2):
     concate_clips(*clips).write_videofile(
         filename,
         codec='libx264',
-        audio_codec='aac',
-        logger=None
+        audio_codec='aac'
         # threads=2
     )
     print("merge_videos successful: ", filename)
