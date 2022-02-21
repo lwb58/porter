@@ -3,7 +3,7 @@ from porter import task_sina, task_intl, task_bilibili, bilibili_redis
 
 
 def task_1():
-    bilibili_cookie = task_bilibili.get_cookies()
+    bilibili_cookie = task_bilibili.get_cookies("15280371963")
     task_sina.download_videos("舞蹈", 5)
     video = task_sina.merge_videos("舞蹈", 2)
     task_bilibili.submit_video(bilibili_cookie, video, "舞蹈", "舞蹈,打卡挑战,必剪创作")
