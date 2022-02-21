@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from porter import sina, intl, bilibili, bilibili_redis, settings
+from porter import sina, intl, bilibili
 
 
 def task_1():
@@ -17,8 +17,8 @@ def task_2():
 
 
 def main():
-    count = bilibili_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY) or 0
-    if int(count) % 3 == 0:
+    count = bilibili.get_submit_count()
+    if count % 3 == 0:
         task_2()
     else:
         task_1()

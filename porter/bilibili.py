@@ -59,6 +59,7 @@ def submit_video(cookies, filename, channel, tag="", desc=""):
     }
     res = api.submit_video(cookies, info)
     print(res)
+    bilibili_redis.incr(settings.SUBMIT_BILIBILI_COUNT_KEY, 1)
     return res
 
 
@@ -67,15 +68,21 @@ def get_cookies(key=None):
     '''获取b站cookie'''
     if key:
         return bilibili_redis.hget("cookies", key)
-    count = bilibili_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY) or 0
     cookies = bilibili_redis.hvals("cookies")
-    return cookies[int(count) % len(cookies)]
+    count = get_submit_count()
+    return cookies[count % len(cookies)]
 
 
 @ConsoleScripts
 def set_cookies(key, value):
     '''设置b站cookie'''
     bilibili_redis.hset("cookies", key, value)
+
+
+def get_submit_count():
+    if not bilibili_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY):
+        bilibili_redis.incr(settings.SUBMIT_BILIBILI_COUNT_KEY, 1)
+    return int(bilibili_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY))
 
 
 # -*- coding:utf-8 -*-
