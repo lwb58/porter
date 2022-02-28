@@ -13,7 +13,8 @@ def task_2():
     bilibili_cookie = task_bilibili.get_cookies("13123371380")
     task_intl.fetch_today_news()
     video = task_intl.gen_news_video()
-    task_bilibili.submit_video(bilibili_cookie, video, "热点", "社会,国际,打卡挑战,必剪创作")
+    if video:
+        task_bilibili.submit_video(bilibili_cookie, video, "热点", "社会,国际,打卡挑战,必剪创作")
 
 
 def main():
