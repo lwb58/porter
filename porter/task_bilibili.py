@@ -3,9 +3,8 @@ import os
 import re
 from bilibili import api
 from bilibili.base.data import TAG_MAP
-from porter import bilibili_redis, settings
+from porter import bilibili_data, settings
 from toolpy.wrapper import ConsoleScripts
-
 
 @ConsoleScripts
 def submit_video(cookies, filename, channel, tag="", desc=""):
@@ -58,31 +57,24 @@ def submit_video(cookies, filename, channel, tag="", desc=""):
         "act_reserve_create": 0,
     }
     res = api.submit_video(cookies, info)
-    print(res)
-    bilibili_redis.incr(settings.SUBMIT_BILIBILI_COUNT_KEY, 1)
+    bilibili_data[settings.SUBMIT_BILIBILI_COUNT_KEY] = get_submit_count() + 1
     return res
 
 
 @ConsoleScripts
-def get_cookies(key=None):
+def get_cookies(key):
     '''获取b站cookie'''
-    if key:
-        return bilibili_redis.hget("cookies", key)
-    cookies = bilibili_redis.hvals("cookies")
-    count = get_submit_count()
-    return cookies[count % len(cookies)]
+    return bilibili_data["cookies"][key]
 
 
 @ConsoleScripts
 def set_cookies(key, value):
     '''设置b站cookie'''
-    bilibili_redis.hset("cookies", key, value)
+    bilibili_data["cookies"][key] = value
 
 
 def get_submit_count():
-    if not bilibili_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY):
-        bilibili_redis.incr(settings.SUBMIT_BILIBILI_COUNT_KEY, 1)
-    return int(bilibili_redis.get(settings.SUBMIT_BILIBILI_COUNT_KEY))
+    return bilibili_data.setdefault(settings.SUBMIT_BILIBILI_COUNT_KEY, 0)
 
 
 # -*- coding:utf-8 -*-

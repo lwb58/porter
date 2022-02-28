@@ -3,7 +3,7 @@ from movpy.editor import VideoFileClip
 from movpy.editor import concate_clips
 from sina import api
 from sina.base.data import SINA_CHANNEL_CID_MAP
-from porter import task_bilibili, sina_redis, settings
+from porter import task_bilibili, sina_data, settings
 from toolpy.wrapper import ConsoleScripts
 
 
@@ -16,7 +16,7 @@ def download_videos(channel, limit=5):
         限制下载数量
     '''
     assert channel in SINA_CHANNEL_CID_MAP.keys()
-    sina_cookies = sina_redis.hget("cookies", "guest")
+    sina_cookies = sina_data["cookies"]["guest"]
     videos = api.fetch_channel_videos_playinfo(sina_cookies, channel, limit)
     for video in videos:
         author = video["playinfo"]["author"]
@@ -27,10 +27,10 @@ def download_videos(channel, limit=5):
 
         if not os.path.exists(author_dir):
             os.makedirs(author_dir)
-
-        if sina_redis.zrank(channel, filepath) is None:
+        
+        if filepath not in sina_data[channel]:
             api.download(sina_cookies, url, filepath)
-            sina_redis.zadd(channel, {filepath: 0})
+            sina_data[channel][filepath] = 0
 
 
 @ConsoleScripts
@@ -42,15 +42,18 @@ def merge_videos(channel, limit=2):
         限制素材数量
     '''
     assert channel in SINA_CHANNEL_CID_MAP.keys()
-    files = sina_redis.zrangebyscore(channel, min=0, max=0, start=0, num=limit)
+
+
+    files = list(filter(lambda file: sina_data[channel][file]==0, sina_data[channel]))[:limit]
     assert len(files) == limit
+
     clips = []
 
     for file in files:
-        print(file)
-        sina_redis.zincrby(channel, 1, file)
         clips.append(VideoFileClip(file).audio_fadeout(3))
+        sina_data[channel][file] += 1
         os.remove(file)
+
 
     count = task_bilibili.get_submit_count()
     title = f"{os.path.basename(files[0])[:-4]} 第 {count % 1000} 弹"
@@ -66,19 +69,15 @@ def merge_videos(channel, limit=2):
 
 
 @ConsoleScripts
-def get_cookies(key=None):
+def get_cookies(key):
     '''获取新浪cookie'''
-    if key:
-        return sina_redis.hget("cookies", key)
-    count = task_bilibili.get_submit_count()
-    cookies = sina_redis.hvals("cookies")
-    return cookies[count % len(cookies)]
+    return sina_data["cookies"][key]
 
 
 @ConsoleScripts
 def set_cookies(key, value):
     '''设置新浪cookie'''
-    sina_redis.hset("cookies", key, value)
+    sina_data["cookies"][key] = value
 
 
 def main():

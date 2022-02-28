@@ -1,5 +1,5 @@
 # -*- coding:utf-8 -*-
-from porter import task_sina, task_intl, task_bilibili, bilibili_redis
+from porter import task_sina, task_intl, task_bilibili, bilibili_data
 
 
 def task_1():
@@ -17,9 +17,9 @@ def task_2():
 
 
 def main():
-    bilibili_redis.incr("task_count", 1)
-    task_count = int(bilibili_redis.get("task_count"))
-    if task_count % 2 == 0:
+    bilibili_data.setdefault("task1_count", 0)
+    bilibili_data["task1_count"] += 1
+    if bilibili_data["task1_count"] % 3 == 0:
         task_2()
     else:
         task_1()

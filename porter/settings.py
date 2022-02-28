@@ -5,6 +5,8 @@ STATIC_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static")
 DOWNLOAD_PATH = "/root/porter/download"
 UPLOAD_PATH = "/tmp/porter/upload"
 
+DATA_PATH = "/root/porter/data.json"
+
 if not os.path.exists(DOWNLOAD_PATH):
     os.makedirs(DOWNLOAD_PATH)
 

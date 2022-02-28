@@ -38,7 +38,7 @@ setup(
         ]
     },
     install_requires=[
-        'redis>=4.1.3'
+        # 'redis>=4.1.3'
     ],
     python_requires='>=3.5',
 )

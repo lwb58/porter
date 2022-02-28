@@ -17,11 +17,11 @@ services:
       - "./data/ImageMagick/policy.xml:/etc/ImageMagick-6/policy.xml"
       - "./data/ssl/openssl.cnf:/etc/ssl/openssl.cnf"
 
-  redis:
-    image: redis
-    container_name: redis
-    hostname: redis
-    environment:
-      - "TZ=Asia/Shanghai"
-    ports: 
-      - "6379:6379"
+  # redis:
+  #   image: redis
+  #   container_name: redis
+  #   hostname: redis
+  #   environment:
+  #     - "TZ=Asia/Shanghai"
+  #   ports: 
+  #     - "6379:6379"

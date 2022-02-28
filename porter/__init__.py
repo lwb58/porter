@@ -1,9 +1,12 @@
 
-import redis
+from toolpy.jsonfile import JsonFile
+from porter import settings
 
-__all__ = ["bilibili_redis", "sina_redis", "intl_redis"]
+__all__ = ["jsondata", "bilibili_data", "sina_data", "intl_data"]
 
-bilibili_redis = redis.Redis(host='redis', port=6379, db=0, decode_responses=True)
-sina_redis = redis.Redis(host='redis', port=6379, db=1, decode_responses=True)
-intl_redis = redis.Redis(host='redis', port=6379, db=2, decode_responses=True)
 
+jsondata = JsonFile(settings.DATA_PATH).data
+
+bilibili_data = jsondata["bilibili"]
+sina_data = jsondata["sina"]
+intl_data = jsondata["intl"]
