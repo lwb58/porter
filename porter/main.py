@@ -6,7 +6,7 @@ def task_1():
     bilibili_cookie = task_bilibili.get_cookies("15280371963")
     task_sina.download_videos("舞蹈", 5)
     video = task_sina.merge_videos("舞蹈", 2)
-    task_bilibili.submit_video(bilibili_cookie, video, "舞蹈", "舞蹈,打卡挑战,必剪创作")
+    task_bilibili.submit_video(bilibili_cookie, video, "舞蹈", "舞蹈,打卡挑战")
 
 
 def task_2():
@@ -14,7 +14,7 @@ def task_2():
     task_intl.fetch_today_news()
     video = task_intl.gen_news_video()
     if video:
-        task_bilibili.submit_video(bilibili_cookie, video, "热点", "社会,国际,打卡挑战,必剪创作")
+        task_bilibili.submit_video(bilibili_cookie, video, "热点", "社会,国际,打卡挑战,社会观察局,星海计划,知识分享官")
 
 
 def main():
