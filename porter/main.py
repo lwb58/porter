@@ -24,6 +24,8 @@ def main():
         task_2()
     else:
         task_1()
+    print("投稿结束！")
+    exit(0)
 
 
 if __name__ == "__main__":
