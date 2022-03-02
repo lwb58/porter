@@ -36,7 +36,7 @@ def gen_news_video():
             content = f'''
             大家好，我是小芳。
             {data["content"]}
-            以上就是视频的全部内容。您有什么看法欢迎留言告诉我。
+            。以上就是视频的全部内容。您有什么看法欢迎留言告诉我。
             '''
             dub(settings.DUB_VIDEO, content, "yanlijie",
                 filepath, speed=3, bgm=settings.DUB_BGM)
