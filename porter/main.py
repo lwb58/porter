@@ -1,4 +1,5 @@
 # -*- coding:utf-8 -*-
+import traceback
 from porter import task_sina, task_intl, task_bilibili, bilibili_data
 
 
@@ -18,14 +19,19 @@ def task_2():
 
 
 def main():
-    bilibili_data.setdefault("task1_count", 0)
-    bilibili_data["task1_count"] += 1
-    if bilibili_data["task1_count"] % 3 == 0:
+    # bilibili_data.setdefault("task1_count", 0)
+    # bilibili_data["task1_count"] += 1
+    # if bilibili_data["task1_count"] % 3 == 0:
+    #     task_2()
+    # else:
+    #     task_1()
+    try:
         task_2()
-    else:
-        task_1()
-    print("投稿结束！")
-    exit(0)
+    except  Exception as e:
+        print(traceback.format_exc())
+    finally:
+        print("投稿结束！")
+        exit(0)
 
 
 if __name__ == "__main__":
